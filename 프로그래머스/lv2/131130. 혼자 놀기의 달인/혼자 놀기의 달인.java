@@ -4,7 +4,6 @@ class Solution {
     int[] newCards;
     boolean[] visited;
     PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
-    static int total = 0;
     public int solution(int[] cards) {
         int answer = 0;
         newCards = new int[cards.length + 1];
@@ -15,9 +14,9 @@ class Solution {
         }
         
         for (int i = 1; i < cards.length + 1; i++) {
-            total = 0;
+            int total = 0;
             if (!visited[i]) {
-                dfs(i);
+                total = dfs(i, total);
             }
             pq.offer(total);
         }
@@ -27,22 +26,17 @@ class Solution {
             int b = pq.poll();
             answer = a * b;
         } 
-        
-        
-        
         return answer;
     }
     
-    void dfs(int i) {
+    int dfs(int i, int total) {
         
         if (visited[i]) {
-            return;
+            return total;
         }
         
         visited[i] = true;
-        total++;
         int nextBox = newCards[i];
-        dfs(nextBox);
-        return;
+        return dfs(nextBox, total + 1);
     }
 }
