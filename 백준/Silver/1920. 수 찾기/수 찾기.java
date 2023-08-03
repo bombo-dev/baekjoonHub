@@ -1,7 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -13,23 +14,18 @@ public class Main {
         private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         private int N;
         private int M;
-        private int[] arr;
+        private Set<Integer> set = new HashSet<>();
 
         public void solution() throws IOException {
             // 생성 할 배열의 수를 입력 받는다.
             N = Integer.parseInt(br.readLine());
-            arr = new int[N];
             StringTokenizer st = new StringTokenizer(br.readLine());
 
             // 배열을 초기화 한다.
             for (int i = 0; i < N; i++) {
-                arr[i] = Integer.parseInt(st.nextToken());
+                set.add(Integer.parseInt(st.nextToken()));
             }
 
-            // 제시된 배열의 크기가 10만이다. 배열의 정렬을 퀵 정렬을 수행하므로 n^2 만큼 발생 할 수 있다.
-            // 하지만, 일정한 수준(배열의 크기가 286이상)으로 커졌을 때에는 mergeSort를 사용하므로 nlogn 만큼 수행한다. 여기서 정렬로 인해 200만의 시간 복잡도가 발생.
-            Arrays.sort(arr);
-            // 탐색할 원소들의 개수를 입력받는다.
             M = Integer.parseInt(br.readLine());
             st = new StringTokenizer(br.readLine());
 
@@ -38,11 +34,10 @@ public class Main {
             // 둘 다 10만이 최고 값이기 때문에, 200만 + 200만 = 400만으로 볼 수 있다.
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < M; i++) {
-                int result = Arrays.binarySearch(arr, Integer.parseInt(st.nextToken()));
-                if (result < 0) {
-                    sb.append(0).append("\n");
-                } else {
+                if (set.contains(Integer.parseInt(st.nextToken()))) {
                     sb.append(1).append("\n");
+                } else {
+                    sb.append(0).append("\n");
                 }
             }
 
