@@ -2,96 +2,97 @@ import java.util.*;
 
 class Solution {
     public int[] solution(String[] info, String[] query) {
-        Map<String, List<Integer>> scoreMap = new HashMap<>();
-        createCondition(info, scoreMap);
+        int[] answer = {};
         
-        return calc(query, scoreMap);
+        List<Resume> resumes = storeResume(info);
+        List<Query> queries = storeQuery(query);
+        System.out.println(queries);
+        
+        return answer;
     }
     
-    private void createCondition(String[] info, Map<String, List<Integer>> scoreMap) {
-        StringBuilder sb = new StringBuilder();
-        for (String information : info) {
-            String[] splitInfo = information.split(" ");
-            String[] result = new String[splitInfo.length - 1];
-            int score = Integer.parseInt(splitInfo[splitInfo.length - 1]);
-            
-            putScoreMap(scoreMap, splitInfo, score, result, 0, sb);
+    private List<Resume> storeResume(String[] info) {
+        List<Resume> resumes = new ArrayList<>();
+        
+        for (String infoValue : info) {
+            StringTokenizer st = new StringTokenizer(infoValue, " ");
+            String language = st.nextToken();
+            String type = st.nextToken();
+            String year = st.nextToken();
+            String food = st.nextToken();
+            int score = Integer.parseInt(st.nextToken());
+            resumes.add(new Resume(language, type, year, food, score));
         }
         
-        for (List<Integer> list : scoreMap.values()) {
-            Collections.sort(list);
+        return resumes;
+    }
+    
+    private List<Query> storeQuery(String[] query) {
+        List<Query> queries = new ArrayList<>();
+        
+        for (String queryValue : query) {
+            String value = queryValue.replaceAll("and", "");
+            StringTokenizer st = new StringTokenizer(value, " +");
+            String language = st.nextToken();
+            String type = st.nextToken();
+            String year = st.nextToken();
+            String food = st.nextToken();
+            int score = Integer.parseInt(st.nextToken());
+            queries.add(new Query(language, type, year, food, score));
+        }
+        
+        return queries;
+    }
+    
+    private static class Resume {
+        private String language;
+        private String type;
+        private String year;
+        private String food;
+        private int score;
+        
+        public Resume(String language, String type, String year, String food, int score) {
+            this.language = language;
+            this.type = type;
+            this.year = year;
+            this.food = food;
+            this.score = score;
+        }
+        
+        @Override
+        public String toString() {
+            return "language : " + language
+                + " , type : " + type 
+                + " , year : " + year
+                + " , food : " + food
+                + " , score : " + score
+                + "\n";
         }
     }
     
-    private void putScoreMap(Map<String, List<Integer>> scoreMap, String[] splitInfo, int score, String[] result, int index, StringBuilder sb) {
-        if (index == splitInfo.length - 1) {
-            settingMap(scoreMap, result, score, sb);
-            return;
+    private static class Query {
+        private String language;
+        private String type;
+        private String year;
+        private String food;
+        private int score;
+        
+        public Query(String language, String type, String year, String food, int score) {
+            this.language = language;
+            this.type = type;
+            this.year = year;
+            this.food = food;
+            this.score = score;
         }
         
-        result[index] = splitInfo[index];
-        putScoreMap(scoreMap, splitInfo, score, result, index + 1, sb);
-        result[index] = "-";
-        putScoreMap(scoreMap, splitInfo, score, result, index + 1, sb);
-        
-    }
-    
-    private void settingMap(Map<String, List<Integer>> scoreMap, String[] result, int score, StringBuilder sb) {
-            sb.setLength(0);
-        
-            for (int i = 0 ; i < result.length; i++) {
-                sb.append(result[i]);
-            }
-            
-            String key = sb.toString();
-            
-            if(!scoreMap.containsKey(key)) {
-                scoreMap.put(key, new ArrayList<>());
-                scoreMap.get(key).add(score);
-            } else {
-                scoreMap.get(key).add(score);
-            }
-    }
-    
-    private int[] calc(String[] query, Map<String, List<Integer>> scoreMap) {
-        
-        int[] result = new int[query.length];
-        
-        for (int i = 0; i < query.length; i++) {
-            String queryInfo = query[i].replaceAll("and", "");
-            String[] splitQuery = queryInfo.split(" +");
-            
-            int score = Integer.parseInt(splitQuery[splitQuery.length - 1]);
-            String key = String.join("", Arrays.copyOf(splitQuery, splitQuery.length - 1));
-            
-            if (!scoreMap.containsKey(key)) {
-                result[i] = 0;
-            } else {
-                result[i] = scoreMap.get(key).size() - count(scoreMap.get(key), score);
-            }
+        @Override
+        public String toString() {
+            return "language : " + language
+                + " , type : " + type 
+                + " , year : " + year
+                + " , food : " + food
+                + " , score : " + score
+                + "\n";
         }
-        
-        return result;
-    }
-    
-    private int count(List<Integer> scores, int score) {
-        return binarySearch(scores, score);
-    }
-    
-    private int binarySearch(List<Integer> scores, int score) {
-        int start = 0;
-        int end = scores.size();
-        
-        while(start < end) {
-            int mid = (start + end) / 2;
-            
-            if (scores.get(mid) >= score) {
-                end = mid;
-            } else {
-                start = mid + 1;
-            }
-        }
-        
-        return start;
     }
 }
