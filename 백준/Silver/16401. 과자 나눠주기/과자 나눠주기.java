@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -25,19 +24,19 @@ public class Main {
             // 과자의 길이는 10억 제한, 나누었을 때 21억을 초과하지 않으므로 int 가능
             st = new StringTokenizer(br.readLine());
 
+            int maxSnack = 0;
             for (int i = 0; i < N; i++) {
                 snacks[i] = Integer.parseInt(st.nextToken());
+                maxSnack = Math.max(maxSnack, snacks[i]);
             }
 
-            Arrays.sort(snacks);
-
-            int maxSnackSize = searchMaxSnackSize(snacks);
+            int maxSnackSize = searchMaxSnackSize(snacks, maxSnack);
             System.out.print(maxSnackSize);
         }
 
-        private int searchMaxSnackSize(int[] snacks) {
+        private int searchMaxSnackSize(int[] snacks, int maxSnack) {
             int start = 1;
-            int end = snacks[N - 1] + 1;
+            int end = maxSnack + 1;
             boolean isSearch = false;
 
             while (start < end) {
@@ -56,7 +55,7 @@ public class Main {
                     start = mid + 1;
                 }
             }
-            
+
             if (!isSearch) {
                 return 0;
             }
