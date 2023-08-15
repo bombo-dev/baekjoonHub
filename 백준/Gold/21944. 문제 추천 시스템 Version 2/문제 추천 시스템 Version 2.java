@@ -13,7 +13,6 @@ public class Main {
         private int P;
         private StringBuilder sb = new StringBuilder();
         private TreeMap<Integer, TreeSet<Question>> perQuestions = new TreeMap<>();
-        private TreeMap<Integer, TreeSet<Question>> perDifficultyQuestion = new TreeMap<>();
         private TreeSet<Question> questions = new TreeSet<>();
         private Map<Integer, Question> questionMap = new HashMap<>();
 
@@ -73,7 +72,6 @@ public class Main {
             perQuestions.get(question.group).remove(question);
             questions.remove(question);
             questionMap.remove(question.questionNumber);
-            perDifficultyQuestion.get(question.difficulty).remove(question);
         }
 
         private void recommendStandardDifficultyQuestion(int condition, int difficulty) {
@@ -121,21 +119,10 @@ public class Main {
                 perQuestions.get(question.group).add(question);
                 questions.add(question);
                 questionMap.put(question.questionNumber, question);
-                fillPerDifficultyQuestion(question);
             } else {
                 perQuestions.get(question.group).add(question);
                 questions.add(question);
                 questionMap.put(question.questionNumber, question);
-                fillPerDifficultyQuestion(question);
-            }
-        }
-
-        private void fillPerDifficultyQuestion(Question question) {
-            if (!perDifficultyQuestion.containsKey(question.difficulty)) {
-                perDifficultyQuestion.put(question.difficulty, new TreeSet<>());
-                perDifficultyQuestion.get(question.difficulty).add(question);
-            } else {
-                perDifficultyQuestion.get(question.difficulty).add(question);
             }
         }
     }
