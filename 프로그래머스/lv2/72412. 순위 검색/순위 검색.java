@@ -1,98 +1,106 @@
 import java.util.*;
 
+
+// 4 * 3 * 3 * 3
+
 class Solution {
+    private Map<String, List<Integer>> scores = new HashMap<>(); 
+    
     public int[] solution(String[] info, String[] query) {
-        int[] answer = {};
+        settingMap(info);
         
-        List<Resume> resumes = storeResume(info);
-        List<Query> queries = storeQuery(query);
-        System.out.println(queries);
-        
-        return answer;
+        return findByQuery(query);
     }
     
-    private List<Resume> storeResume(String[] info) {
-        List<Resume> resumes = new ArrayList<>();
+    private void settingMap(String[] infos) {
+        StringBuilder sb = new StringBuilder();
         
-        for (String infoValue : info) {
-            StringTokenizer st = new StringTokenizer(infoValue, " ");
-            String language = st.nextToken();
-            String type = st.nextToken();
-            String year = st.nextToken();
-            String food = st.nextToken();
-            int score = Integer.parseInt(st.nextToken());
-            resumes.add(new Resume(language, type, year, food, score));
+        for (String info : infos) {
+            String[] value = info.split(" ");
+            int score = stoi(value[value.length - 1]);
+            
+            String[] keyArr = new String[value.length - 1];
+            putKey(value, score, keyArr, 0, sb);
         }
         
-        return resumes;
-    }
-    
-    private List<Query> storeQuery(String[] query) {
-        List<Query> queries = new ArrayList<>();
-        
-        for (String queryValue : query) {
-            String value = queryValue.replaceAll("and", "");
-            StringTokenizer st = new StringTokenizer(value, " +");
-            String language = st.nextToken();
-            String type = st.nextToken();
-            String year = st.nextToken();
-            String food = st.nextToken();
-            int score = Integer.parseInt(st.nextToken());
-            queries.add(new Query(language, type, year, food, score));
-        }
-        
-        return queries;
-    }
-    
-    private static class Resume {
-        private String language;
-        private String type;
-        private String year;
-        private String food;
-        private int score;
-        
-        public Resume(String language, String type, String year, String food, int score) {
-            this.language = language;
-            this.type = type;
-            this.year = year;
-            this.food = food;
-            this.score = score;
-        }
-        
-        @Override
-        public String toString() {
-            return "language : " + language
-                + " , type : " + type 
-                + " , year : " + year
-                + " , food : " + food
-                + " , score : " + score
-                + "\n";
+        for (List<Integer> score : scores.values()) {
+            Collections.sort(score);
         }
     }
     
-    private static class Query {
-        private String language;
-        private String type;
-        private String year;
-        private String food;
-        private int score;
-        
-        public Query(String language, String type, String year, String food, int score) {
-            this.language = language;
-            this.type = type;
-            this.year = year;
-            this.food = food;
-            this.score = score;
+    private void putKey(String[] value, int score, String[] keys, int index, StringBuilder sb) {
+        if (index == value.length - 1) {
+            sb.setLength(0);
+            
+            for(String key : keys) {
+                sb.append(key);
+            }
+            
+            String key = sb.toString();
+            
+            if (!scores.containsKey(key)) {
+                scores.put(key, new ArrayList<>());
+                scores.get(key).add(score);
+            } else {
+                scores.get(key).add(score);
+            }
+            
+            return;
         }
         
-        @Override
-        public String toString() {
-            return "language : " + language
-                + " , type : " + type 
-                + " , year : " + year
-                + " , food : " + food
-                + " , score : " + score
-                + "\n";
+        keys[index] = value[index];
+        putKey(value, score, keys, index + 1, sb);
+        keys[index] = "-";
+        putKey(value, score, keys, index + 1, sb);
+    }
+    
+    private int[] findByQuery(String[] queries) {
+        
+        int[] results = new int[queries.length];
+        
+        for (int i = 0; i < queries.length; i++) {
+            String[] keyArr = queries[i].replaceAll("and", "")
+                .split(" +");
+            
+            int score = stoi(keyArr[keyArr.length - 1]);
+            String key = String.join("", Arrays.copyOf(keyArr, keyArr.length - 1));
+            
+            if (!scores.containsKey(key)) {
+                results[i] = 0;
+            } else {
+                results[i] = scores.get(key).size() - parametricSearch(scores.get(key), score);
+            }
         }
+        
+        return results;
+    }
+    
+    private int parametricSearch(List<Integer> scoreList, int score) {
+        int start = 0;
+        int end = scoreList.size();
+        
+        while (start < end) {
+            int mid = (start + end) / 2;
+            
+            if (scoreList.get(mid) >= score) {
+                end = mid;
+            } else {
+                start = mid + 1;
+            }
+        }
+        
+        return start;
+    }
+    
+    private void print() {
+        System.out.println(scores.keySet().size());
+        
+        for (String key : scores.keySet()) {
+            System.out.println(key);
+        }
+    }
+    
+    private int stoi(String value) {
+        return Integer.parseInt(value);
     }
 }
