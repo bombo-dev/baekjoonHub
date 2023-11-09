@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.math.BigInteger;
 import java.util.StringTokenizer;
 
 public class Main {
@@ -17,18 +16,15 @@ public class Main {
             var value = "";
 
             while ((value = br.readLine()) != null) {
-                var inputBigInteger = new BigInteger(value);
-                var base = BigInteger.ZERO;
+                var n = stoi(value);
+                var base = 1;
+                var count = 1;
 
-                while (true) {
-                    base = base.multiply(BigInteger.TEN)
-                            .add(BigInteger.ONE);
-
-                    if (base.mod(inputBigInteger).equals(BigInteger.ZERO)) {
-                        sb.append(base.toString().length()).append("\n");
-                        break;
-                    }
+                while ((base = base % n) != 0) {
+                    count++;
+                    base = base * 10 + 1;
                 }
+                sb.append(count).append("\n");
             }
             System.out.print(sb);
         }
