@@ -1,97 +1,105 @@
-import java.io.*;
-import java.util.*;
-
-class Status {
-    int x;
-    int y;
-    boolean crash;
-
-    public Status(int x, int y, boolean crash) {
-        this.x = x;
-        this.y = y;
-        this.crash = crash;
-    }
-}
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.StringTokenizer;
 
 public class Main {
-    static StringTokenizer st;
-    static int r;
-    static int c;
-    static int[][] graph;
-    static int[][] time;
-    static boolean[][] visitedCrash; // 벽을 부수고 방문
-    static boolean[][] visitedNoCrash; // 벽을 안부수고 방문
-    static int[] dx = {-1, 0, 1, 0};
-    static int[] dy = {0, 1, 0, -1};
-    static int min = Integer.MAX_VALUE;
-    static Queue<Status> q = new LinkedList<>();
-
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        st = new StringTokenizer(br.readLine(), " ");
-        r = Integer.parseInt(st.nextToken());
-        c = Integer.parseInt(st.nextToken());
-        graph = new int[r][c];
-        time = new int[r][c];
-        visitedCrash = new boolean[r][c];
-        visitedNoCrash = new boolean[r][c];
-
-        time[0][0] = 1;
-        visitedCrash[0][0] = true;
-        visitedNoCrash[0][0] = true;
-
-
-        for (int i = 0; i < r; i++) {
-            String value = br.readLine();
-            for (int j = 0; j < c; j++) {
-                graph[i][j] = value.charAt(j) - '0';
-            }
-        }
-
-        q.offer(new Status(0, 0, false));
-
-        BFS();
-
-        if (time[r - 1][c - 1] == 0) {
-            System.out.print(-1);
-        } else {
-            System.out.print(min);
-        }
+        new Solution().solve();
     }
 
-    public static void BFS() {
-        while (!q.isEmpty()) {
-            Status position = q.poll();
-            int px = position.x;
-            int py = position.y;
-            boolean crash = position.crash;
-            
-            if(px == r - 1 && py == c - 1) {
-                min = Math.min(min, time[px][py]);
+    private static class Solution {
+        private int max = 0;
+        private BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        private int N;
+        private int M;
+
+        private int[] dx = new int[]{-1, 0, 1, 0};
+        private int[] dy = new int[]{0, 1, 0, -1};
+        private int[][] board;
+        private boolean[][][] visited;
+
+
+        public void solve() throws IOException {
+            StringTokenizer st = getStringTokenizer();
+            N = stoi(st.nextToken());
+            M = stoi(st.nextToken());
+
+            board = new int[N + 1][M + 1];
+            visited = new boolean[2][N + 1][M + 1];
+
+            for (int i = 1; i <= N; i++) {
+                String value = br.readLine();
+                for (int j = 0; j < M; j++) {
+                    int wall = Character.getNumericValue(value.charAt(j));
+                    board[i][j + 1] = wall;
+                }
             }
 
-            for (int i = 0; i < 4; i++) {
-                int nx = px + dx[i];
-                int ny = py + dy[i];
+            visited[0][1][1] = true;
+            bfs();
 
-                if (nx >= 0 && nx < r && ny >= 0 && ny < c) {
-                    if(!crash && !visitedNoCrash[nx][ny]) {
-                        if(graph[nx][ny] == 1) {
-                            q.offer(new Status(nx, ny, true));
-                        } else {
-                            q.offer(new Status(nx, ny, false));
-                        }
-                        time[nx][ny] = time[px][py] + 1;
-                        visitedNoCrash[nx][ny] = true;
-                    } else if(crash && !visitedCrash[nx][ny]){
-                        if(graph[nx][ny] == 0) {
-                            q.offer(new Status(nx, ny, true));
-                            time[nx][ny] = time[px][py] + 1;
-                            visitedCrash[nx][ny] = true;
+            if (max == 0) {
+                System.out.print(-1);
+            } else {
+                System.out.print(max);
+            }
+        }
+
+        private void bfs() {
+            Deque<int[]> dq = new ArrayDeque<>();
+            dq.offerLast(new int[]{1, 1, 0, 1});
+
+            while (!dq.isEmpty()) {
+                int[] now = dq.pollFirst();
+                int x = now[0];
+                int y = now[1];
+                int visit = now[2];
+                int count = now[3];
+
+                if (x == N && y == M) {
+                    max = count;
+                    return;
+                }
+
+                for (int i = 0; i < 4; i++) {
+                    int nx = x + dx[i];
+                    int ny = y + dy[i];
+
+                    if (nx < 1 || nx > N || ny < 1 || ny > M) {
+                        continue;
+                    }
+
+                    if (visited[visit][nx][ny]) {
+                        continue;
+                    }
+
+                    if (board[nx][ny] == 0) {
+                        visited[visit][nx][ny] = true;
+                        dq.offerLast(new int[]{nx, ny, visit, count + 1});
+                    } else {
+                        if (visit == 0) {
+                            visited[1][nx][ny] = true;
+                            dq.offerLast(new int[]{nx, ny, 1, count + 1});
                         }
                     }
                 }
             }
+        }
+
+        private StringTokenizer getStringTokenizer(String delim) throws IOException {
+            return new StringTokenizer(br.readLine(), delim);
+        }
+
+        private StringTokenizer getStringTokenizer() throws IOException {
+            return new StringTokenizer(br.readLine());
+        }
+
+        private int stoi(String number) {
+            return Integer.parseInt(number);
         }
     }
 }
